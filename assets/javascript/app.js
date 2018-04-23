@@ -16,7 +16,6 @@ function initMap() {
         position: {lat:39.7392, lng:-104.9903},
         map:map
         });
-
     var infoWindow = new google.maps.InfoWindow({
         content:"<h1>Denver, CO</h1>"
         });
@@ -158,10 +157,6 @@ $(document).ready(function () {
     //formats map marker
     marker = "";
 
-
-
-
-
     //Location suggestion 1 identified by a marker
     /*addMarker = "";
     //Location suggestion 2
@@ -174,7 +169,7 @@ $(document).ready(function () {
     //Controles program logic
     function controller() {
         locationButtons()
-        validateEmail()
+        // validateEmail()
     }
 
 
@@ -191,11 +186,13 @@ $(document).ready(function () {
 
     // Functionality when locations are selected
     function locationButtons() {
-        // Adding an event listener to all  boxes with a class of "locationBtn"
+
+        var locations = [];
+        // Adding an event listener to all checkboxes with a class of "locationBtn"
         $(":checkbox").change(function () {
             queryLocation = $(this).val();
             identifier = $(this).attr("data-idName");
-
+          
             if (this.checked) {
                 showAndHide()
                 weatherRequest(queryLocation);
@@ -240,6 +237,7 @@ $(document).ready(function () {
         // These come from the forcastURL
         var timestamp24, timestamp48, timestamp72, timestamp96, timestamp120, icon24, icon48, icon72, icon96, icon120, high24, high48, high72, high96, high120, low24, low48, low72, low96, low120, description24, description48, description72, description96, description120;
 
+
         firstWeather();
 
         // Creates a new row to store location based weather
@@ -267,7 +265,6 @@ $(document).ready(function () {
                     lon = response.coord.lon;
                     lat = response.coord.lat;
 
-
                     //creating the table data for the currentWeather
                     currentWeather = "<td><strong>" + prettyName + "</strong><img src ='" + currentIcon + "' alt ='Weather Icon'><br> Currently: " + currentTemp + "&#8457 <br> Wind: " + currentWind + " mph <br>" + currentDescription + "</td>";
                     // console.log(currentWeather);
@@ -276,29 +273,29 @@ $(document).ready(function () {
                     weatherRow.append(currentWeather);
                     secondWeather();
 
-                    // coords = "{ lat: " + lat + ", lng: " + lon + " }";
-                    (markers).append(coords);
+                    mapCoordinates = "{ lat: " + lat + ", lng: " + lon + " }"
 
+                    
                     //format for marker
                     // marker = "coords: " + mapCoordinates + ",content: '<h1>" + cityName + "</h1>'}"
-                    // marker = "coords: " + mapCoordinates;
-                    console.log('marker =' + marker);
+                    marker = "coords: " + mapCoordinates;
+                    console.log('marker =' + marker)
                     console.log(markers);
-
-                    markers.append(marker);
-                    console.log('Working?');
-
-                    console.log("this will only appear if the above stuff is working");
+                    
+                    markers.push(marker);
+                    console.log("something2");
 
                 });
         }
         // for forecasted weather
         function secondWeather() {
+
             $.ajax({
                 url: forecastURL,
                 method: "GET"
             })
                 .then(function (response) {
+
                     // console.log("forecastURL= " + forecastURL);
                     timestamp24 = moment.unix(response.list[8].dt).format("MMM DD");
                     // console.log('timestamp24 =' + timestamp24);
@@ -352,6 +349,34 @@ $(document).ready(function () {
                     description120 = response.list[response.list.length - 1].weather[0].description;
                     // console.log(description120);
 
+                    timestamp24 = moment.unix(response.list[8].dt).format("MMM DD");
+                    timestamp48 = moment.unix(response.list[16].dt).format("MMM DD");
+                    timestamp72 = moment.unix(response.list[24].dt).format("MMM DD");
+                    timestamp96 = moment.unix(response.list[32].dt).format("MMM DD");
+                    timestamp120 = moment.unix(response.list[response.list.length - 1].dt).format("MMM DD");
+
+                    icon24 = "http://openweathermap.org/img/w/" + response.list[8].weather[0].icon + ".png"
+                    icon48 = "http://openweathermap.org/img/w/" + response.list[16].weather[0].icon + ".png"
+                    icon72 = "http://openweathermap.org/img/w/" + response.list[24].weather[0].icon + ".png"
+                    icon96 = "http://openweathermap.org/img/w/" + response.list[32].weather[0].icon + ".png"
+                    icon120 = "http://openweathermap.org/img/w/" + response.list[response.list.length - 1].weather[0].icon + ".png"
+                    high24 = response.list[8].main.temp_max;
+                    high48 = response.list[16].main.temp_max;
+                    high72 = response.list[24].main.temp_max;
+                    high96 = response.list[32].main.temp_max;
+                    high120 = response.list[response.list.length - 1].main.temp_max;
+                    low24 = response.list[8].main.temp_min;
+                    low48 = response.list[16].main.temp_min;
+                    low72 = response.list[24].main.temp_min;
+                    low96 = response.list[32].main.temp_min;
+                    low120 = response.list[response.list.length - 1].main.temp_min;
+                    description24 = response.list[8].weather[0].description;
+                    description48 = response.list[16].weather[0].description;
+                    description72 = response.list[24].weather[0].description;
+                    description96 = response.list[32].weather[0].description;
+                    description120 = response.list[response.list.length - 1].weather[0].description;
+
+
                     forecastWeather24 = "<td><strong>" + timestamp24 + "</strong><img src ='" + icon24 + "' alt ='Weather Icon'><br> High: " + high24 + "&#8457 <br> Low: " + low24 + "&#8457 <br>" + description24 + "</td>";
 
                     forecastWeather48 = "<td><strong>" + timestamp48 + "</strong><img src ='" + icon48 + "' alt ='Weather Icon'><br> High: " + high48 + "&#8457 <br> Low: " + low48 + "&#8457 <br>" + description48 + "</td>";
@@ -368,6 +393,7 @@ $(document).ready(function () {
                     weatherRow.append(forecastWeather);
                 });
         }
+
         // $("#weather_image").attr("src", "http://openweathermap.org/img/w/" + response.weather[0].icon + ".png");
     }
 
@@ -376,6 +402,7 @@ $(document).ready(function () {
         clearAll.preventDefault();
         $("#weatherWidget").empty();
         $("#selectMessage").show();
+        $(":checkbox").prop('checked', false);
     });
 
 
@@ -405,4 +432,35 @@ $(document).ready(function () {
 
     }
 
+    //Initializes Firebase
+    var config = {
+        apiKey: "AIzaSyDArV6eE1B4jA-wTGWT0sKUmbSobhgd78U",
+        authDomain: "project-1-b6d47.firebaseapp.com",
+        databaseURL: "https://project-1-b6d47.firebaseio.com",
+        projectId: "project-1-b6d47",
+        storageBucket: "project-1-b6d47.appspot.com",
+        messagingSenderId: "137075171849"
+    };
+    firebase.initializeApp(config);
+
+
+    var database = firebase.database();
+    // Initial Values
+    var email = "";
+    // Capture Button Click
+    $("#signup-button").on("click", function() {
+        // Don't refresh the page
+        event.preventDefault();
+        // Store and retrieve email submission
+        email = $("#email-input").val().trim();
+        // Push email data to Firebase
+        database.ref().push(email); 
+        // Log user email input
+        console.log(email);
+        // Clears the text-box
+        $("#email-input").val("");
+        // Prints Success Message
+        $("#signup-success").text("Thanks for signing up!");
+        
+      });
 }); //ends the "document.ready" code
